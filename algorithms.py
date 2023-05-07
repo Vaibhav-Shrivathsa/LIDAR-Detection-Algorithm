@@ -93,16 +93,17 @@ class SlidingBoxAlgorithm(Algorithm):
     """
     def __init__(self):
         self.ANGLE_SUBDIVISIONS = 8
-        self.ANGLE_INCREMENT = math.pi / (2 * (self.ANGLE_SUBDIVISIONS - 1))
+        self.ANGLE_INCREMENT = (math.pi / 2) / self.ANGLE_SUBDIVISIONS
 
         c, s = np.cos(self.ANGLE_INCREMENT), np.sin(self.ANGLE_INCREMENT)
         self.rotByAngleIncrement = np.array(((c, -s), (s, c)))
         self.rotByAngleIncrementInv = np.array(((c, s), (-s, c)))
 
     def locateCenter(self, hitPoints, screen, programRunner):
-        center = np.array([0, 0])
         if len(hitPoints) == 0:
-            return center
+            return np.array([0, 0])
+
+        center = np.array([0, 0])
         totalArea = 0
 
         hitPoints = list(map(lambda x: np.asarray(x), hitPoints))
@@ -110,9 +111,7 @@ class SlidingBoxAlgorithm(Algorithm):
         rotByCurrAngle = np.identity(2)
         rotByCurrAngleInv = np.identity(2)
 
-        for i in range(self.ANGLE_SUBDIVISIONS - 1):
-            hitPoints = list(map(lambda x: rotByCurrAngle.dot(x), hitPoints))
-
+        for i in range(self.ANGLE_SUBDIVISIONS):
             maxX = max(map(lambda point: point[0], hitPoints))
             maxY = max(map(lambda point: point[1], hitPoints))
             minX = min(map(lambda point: point[0], hitPoints))
@@ -141,8 +140,7 @@ class SlidingBoxAlgorithm(Algorithm):
                 # rectPoints = list(map(lambda x: tuple(rotByCurrAngleInv.dot(x)), rectPoints))
                 # pygame.draw.polygon(screen, (100, 200, 255), rectPoints, 1)
 
-            hitPoints = list(map(lambda x: rotByCurrAngleInv.dot(x), hitPoints))
-            rotByCurrAngle = self.rotByAngleIncrement.dot(rotByCurrAngle)
+            hitPoints = list(map(lambda x: self.rotByAngleIncrement.dot(x), hitPoints))
             rotByCurrAngleInv = self.rotByAngleIncrementInv.dot(rotByCurrAngleInv)
 
         if totalArea == 0:

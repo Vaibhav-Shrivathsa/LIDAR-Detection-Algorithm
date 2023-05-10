@@ -93,6 +93,8 @@ class SlidingBoxAlgorithm(Algorithm):
     """
     def __init__(self):
         self.ANGLE_SUBDIVISIONS = 8
+        self.LEEWAY_FACTOR = 1.1
+
         self.ANGLE_INCREMENT = (math.pi / 2) / self.ANGLE_SUBDIVISIONS
 
         c, s = np.cos(self.ANGLE_INCREMENT), np.sin(self.ANGLE_INCREMENT)
@@ -108,7 +110,6 @@ class SlidingBoxAlgorithm(Algorithm):
 
         hitPoints = list(map(lambda x: np.asarray(x), hitPoints))
 
-        rotByCurrAngle = np.identity(2)
         rotByCurrAngleInv = np.identity(2)
 
         for i in range(self.ANGLE_SUBDIVISIONS):
@@ -117,15 +118,20 @@ class SlidingBoxAlgorithm(Algorithm):
             minX = min(map(lambda point: point[0], hitPoints))
             minY = min(map(lambda point: point[1], hitPoints))
 
-            robotWidth = programRunner.SIM_ROBOT_SIZE * 1.1
+            # Since we are not checking all infinite possible
+            # rotations of valid squares, we use a valid square size
+            # slightly larger than the actual regulation sized square
+            # to give us some leeway when finding valid squares
+            robotWidth = programRunner.SIM_ROBOT_SIZE * self.LEEWAY_FACTOR
             halfRobotWidth = robotWidth / 2
 
-            centerMaxX = minX + halfRobotWidth
-            centerMaxY = minY + halfRobotWidth
-            centerMinX = maxX - halfRobotWidth
-            centerMinY = maxY - halfRobotWidth
-
+            # Check if there are valid squares of the current rotation
             if maxX - minX <= robotWidth and maxY - minY <= robotWidth:
+                centerMaxX = minX + halfRobotWidth
+                centerMaxY = minY + halfRobotWidth
+                centerMinX = maxX - halfRobotWidth
+                centerMinY = maxY - halfRobotWidth
+
                 area = (centerMaxX - centerMinX) * (centerMaxY - centerMinY)
                 totalArea += area
                 middleOfRectangle = np.array([(centerMinX + centerMaxX) / 2, (centerMinY + centerMaxY) / 2])

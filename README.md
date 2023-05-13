@@ -15,6 +15,10 @@ Run `python playground.py` while in the project directory to start the program.
 
 I was tasked with exploring the problem of tracking opposing robots using a LIDAR mounted on an robot. The LIDAR can measure the distance of objects away from the robot in a multitude of different directions. Using this data, a point cloud of what the robot “sees” around it can be extracted. The problem with trying to track other robots with this is that LIDAR data says nothing about the geometry of the side of objects not exposed to the LIDAR, and the LIDAR shoots beams in a plane, so the point clouds only give the geometry of a cross-section of other robots. Due to physical constraints, the LIDAR had to be mounted up high on our robot. The base of the robots we were dealing with were usually square, but higher up, there is no garuntee of what shape we will see. Thus, the cross sections the LIDAR would see would be highly variable, sometimes discontinuous, and may not reflect the geometry of the robot as a whole.
 
+<img src="https://github.com/Vaibhav-Shrivathsa/LIDAR-Detection-Algorithm/assets/87554847/fac3cef4-328b-4f69-84bf-4fefb63271d3" width="700">
+
+<img src="https://github.com/Vaibhav-Shrivathsa/LIDAR-Detection-Algorithm/assets/87554847/230467cb-ca24-4fb3-90d7-232dab281ed6" width="700">
+
 Suppose that you isolate some points that you can associate to be a part of an opposing robot. The easiest way to estimate the center of this robot is to take the average of these points. The problem with this is that the estimate will be biased towards the LIDAR, since the point cloud consists only of points that are exposed to the LIDAR. The backs of opposing robots, for example, will not be present in the point cloud.
 
 ## Preliminary Ideas in Finding a More Accurate Estimate
@@ -23,11 +27,11 @@ One idea I had before being notified that the LIDAR had to be mounted high up is
 
 Example two faces that the LIDAR may pick up:
 
-<img src="https://user-images.githubusercontent.com/87554847/236612808-20df41ef-2343-4b0b-90a5-17a9d2608c02.png"  width="340" height="300">
+<img src="https://user-images.githubusercontent.com/87554847/236612808-20df41ef-2343-4b0b-90a5-17a9d2608c02.png"  width="340">
 
 Construct the perpendicular bisectors of each face and their intersection is the location of the center:
 
-<img src="https://user-images.githubusercontent.com/87554847/236612924-608d9365-9db5-44e2-b401-5ff469934d6a.png"  width="370" height="300">
+<img src="https://user-images.githubusercontent.com/87554847/236612924-608d9365-9db5-44e2-b401-5ff469934d6a.png"  width="370">
 
 However, this idea wouldn't work since as mentioned before, the LIDAR had to be mounted up high.
 
@@ -61,13 +65,13 @@ First, let "valid square" mean a square of regulation size that contains all the
 
 Let's break down the problem into a simpler one. Suppose that we cannot rotate the square, so it must stay upright. Through some quick experimentation, we can visually see what all of the valid squares are by sliding around the square:
 
-<img src="https://user-images.githubusercontent.com/87554847/236617876-3eb8fb08-fba9-4169-9a4e-48d60c1d069b.gif"  width="320" height="300">
+<img src="https://user-images.githubusercontent.com/87554847/236617876-3eb8fb08-fba9-4169-9a4e-48d60c1d069b.gif"  width="320">
 
 If the highest point is below the top edge of the square, the left-most point is to the right of the left edge of the square, etc., then the square is valid.
 
 Furthermore, we can see that the centers of all of these valid squares form a rectangle:
 
-<img src="https://user-images.githubusercontent.com/87554847/236618434-f89e9447-034f-484c-8038-21ecf658e63e.gif"  width="320" height="350">
+<img src="https://user-images.githubusercontent.com/87554847/236618434-f89e9447-034f-484c-8038-21ecf658e63e.gif"  width="320">
 
 The center of the rectangle can't go any more right when the left side of the square strikes the left most point, so the x-coordinate of the right side of the rectangle is $L.x + \frac{S}{2}$ where $L$ is the left most point and $S$ is the side length of the square.
 
@@ -77,19 +81,19 @@ Similar logic can be used to derive the other coordinates of this rectangle, and
 
 Say now that we want to find all valid squares of a certain rotation, and more importantly, their centers:
 
-<img src="https://user-images.githubusercontent.com/87554847/236619007-a056381c-5061-449d-8552-7ac03386c259.png"  width="330" height="300">
+<img src="https://user-images.githubusercontent.com/87554847/236619007-a056381c-5061-449d-8552-7ac03386c259.png"  width="330">
 
 We can rotate the entire problem so that the square is upright:
 
-<img src="https://user-images.githubusercontent.com/87554847/236619547-9a377f1b-2b0e-4c64-b261-8d74402157be.png"  width="300" height="300">
+<img src="https://user-images.githubusercontent.com/87554847/236619547-9a377f1b-2b0e-4c64-b261-8d74402157be.png"  width="300">
 
 Solve for all the centers of valid upright squares there:
 
-<img src="https://user-images.githubusercontent.com/87554847/236619956-e1033e77-e569-497f-a668-7c8a1927f73e.png"  width="270" height="300">
+<img src="https://user-images.githubusercontent.com/87554847/236619956-e1033e77-e569-497f-a668-7c8a1927f73e.png"  width="270">
 
 Rotate back to get the solution:
 
-<img src="https://user-images.githubusercontent.com/87554847/236620151-147654c5-e37f-4800-8200-1b2f3f938dc2.png"  width="280" height="300">
+<img src="https://user-images.githubusercontent.com/87554847/236620151-147654c5-e37f-4800-8200-1b2f3f938dc2.png"  width="280">
 
 The rotations can be performed using rotation matrices
 

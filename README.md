@@ -1,4 +1,4 @@
-# LIDAR-Detection-Algorithm
+# LIDAR-Robot-Tracking-Algorithm
 
 LIDAR simulator and visualizer along with an algorithm to calculate the center of robots through LIDAR data.
 
